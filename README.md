@@ -1,5 +1,5 @@
 # event-sim-data-converters
-simulated event data converters
+simulated event data converters and processing scripts. See the readme in each folder for details of how to use.
 
 ### e-nerf_synth_datapipeline contains:
 - enerf -> nerfstudio
