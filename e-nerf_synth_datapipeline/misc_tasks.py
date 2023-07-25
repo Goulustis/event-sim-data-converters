@@ -86,5 +86,5 @@ def comb_event_npys(event_dir):
 
 
 if __name__ == "__main__":
-    create_clear_coarse()
-    # comb_event_npys("/scratch/matthew/projects/enerf/data/enerf_adapt_carpet/events")
+    # create_clear_coarse()
+    comb_event_npys("/scratch/matthew/projects/enerf/data/enerf_adapt_carpet/events")
