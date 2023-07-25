@@ -1,0 +1,16 @@
+*.png
+*.npy
+*.json
+*.h5
+*.hdf5
+*.txt
+*.mp4
+*.zip
+*.csv
+*.bag
+*.bin
+*.pyc
+*.db
+*.xyz
+*.glb
+*.ini
