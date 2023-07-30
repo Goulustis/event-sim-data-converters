@@ -8,6 +8,7 @@ from concurrent import futures
 import torch
 import numpy as np
 from tqdm import tqdm
+import argparse
 
 
 dtype_dic = {"x": np.dtype("u2"),
@@ -84,14 +85,15 @@ def write_data(out_dic, data_dic):
     
 
 @torch.no_grad()
-def main():
-    vid_dir = "rgbs/hosp_carpet"
-    device = "cuda"
-    out_f = "hosp_carpet_events.hdf5"
-    img_fs = sorted(glob.glob(osp.join(vid_dir, "*.png")))
-    img_ts = gen_colcam_triggers(vid_dir, scene_mode="carpet")
+def main(frame_dir, targ_f, device="cuda"):
+    device = device if torch.cuda.is_available() else "cpu"
+    # vid_dir = "rgbs/hosp_carpet"
+    # device = "cuda"
+    # out_f = "hosp_carpet_events.hdf5"
+    img_fs = sorted(glob.glob(osp.join(frame_dir, "*.png")))
+    img_ts = gen_colcam_triggers(frame_dir, scene_mode="carpet")
 
-    event_file = h5py.File(out_f, "w")
+    event_file = h5py.File(targ_f, "w")
     out_dic = {}
     for k, v in dtype_dic.items():
         out_dic[k] = event_file.create_dataset(k, (0,), dtype=v, maxshape=(None,))
@@ -122,4 +124,9 @@ def main():
     #         del v
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--frame_dir", type="str", default="")
+    parser.add_argument("--targ_f", type=str)
+    args = parser.parse_args()
+
+    main(args.frame_dir, args.targ_f)
