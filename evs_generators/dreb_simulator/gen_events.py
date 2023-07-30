@@ -95,7 +95,7 @@ def gen_events(src_dir, targ_f, C=0.2):
 
 
 if __name__ == "__main__":
-    parser = argparse.parser()
+    parser = argparse.ArgumentParser()
     parser.add_argument("--frame_dir", default = "/scratch/matthew/projects/synth_datapipeline/synthetic_ev_scene/fine_frames/gamma")
     parser.add_argument("--targ_f", default = "events.hdf5")
     parser.add_argument("--ev_thresh", type=float)
