@@ -85,7 +85,7 @@ def write_data(out_dic, data_dic):
     
 
 @torch.no_grad()
-def main(frame_dir, targ_f, device="cuda"):
+def main(frame_dir, targ_f, ev_thresh = 0.2, device="cuda"):
     device = device if torch.cuda.is_available() else "cpu"
     # vid_dir = "rgbs/hosp_carpet"
     # device = "cuda"
@@ -100,7 +100,7 @@ def main(frame_dir, targ_f, device="cuda"):
 
     imgs = np.stack(parallel_map(lambda x : cv2.imread(x, cv2.IMREAD_GRAYSCALE), img_fs))
 
-    esim = esim_torch.ESIM(contrast_threshold_neg=0.2, contrast_threshold_pos=0.2)
+    esim = esim_torch.ESIM(contrast_threshold_neg=ev_thresh, contrast_threshold_pos=ev_thresh)
     data_iter = batchify(imgs, img_ts, batch_size=32)
     data_dic = {}
 
@@ -125,8 +125,9 @@ def main(frame_dir, targ_f, device="cuda"):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--frame_dir", type="str", default="")
+    parser.add_argument("--frame_dir", type=str, default="")
     parser.add_argument("--targ_f", type=str)
+    parser.add_argument("--ev_thresh",type=float)
     args = parser.parse_args()
 
-    main(args.frame_dir, args.targ_f)
+    main(args.frame_dir, args.targ_f, args.ev_thresh)
