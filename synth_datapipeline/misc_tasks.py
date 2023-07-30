@@ -9,6 +9,7 @@ import numpy as np
 import os
 import shutil
 from utils import gen_colcam_triggers, read_cameras
+import argparse
 
 def create_txt_triggers():
     from utils import gen_colcam_triggers
@@ -124,6 +125,32 @@ def create_clear_coarse(gap_size=8):
 
         triggers = gen_colcam_triggers(src_dir)[mv_idxs]
         write_trig(triggers, targ_dir)
+
+
+
+def create_clear_coarse_paramed(src_dir, dst_dir, gap_size=8):
+    st_idx = gap_size//2
+    def cp_files(fs, targ_dir):
+        os.makedirs(targ_dir, exist_ok=True)
+        for i, f in enumerate(fs):
+            dst_f = osp.join(targ_dir, f'{str(i).zfill(4)}.png')
+            shutil.copy(f, dst_f)
+    
+    def write_trig(trigs, targ_dir):
+        with open(osp.join(targ_dir, "triggers.txt"), "w") as f:
+            for t in trigs:
+                f.write(str(t) + "\n")
+    
+    print("done clear coarse")
+
+    img_fs = np.array(sorted(glob.glob(osp.join(src_dir, "*.png"))))
+    mv_idxs = np.array(list(range(len(img_fs))))[st_idx:][::gap_size]
+    mv_img_fs = img_fs[mv_idxs]
+    targ_dir = dst_dir
+    cp_files(mv_img_fs, targ_dir)
+
+    triggers = gen_colcam_triggers(src_dir)[mv_idxs]
+    write_trig(triggers, targ_dir)
 
 
 def get_every_n(n = 32):
@@ -306,7 +333,12 @@ def conform_to_slerp():
 
 
 if __name__ == "__main__":
-    # create_clear_coarse()
-    create_ev_vid()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--src_dir", help="directory containing images", default="")
+    parser.add_argument("--dst_dir", help="directory to save the data", default="")
+    parser.add_argument("--gap_size", help="number of frames in between selected frames", default=8)
+    args = parser.parse_args()
+    create_clear_coarse_paramed(args.src_dir, args.dst_dir, args.gap_size)
+    # create_ev_vid()
     # comb_cat_robo()
     # conform_to_slerp()
