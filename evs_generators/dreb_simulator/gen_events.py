@@ -4,13 +4,16 @@ import tqdm
 import glob
 import os.path as osp
 import cv2 
+import argparse
 
 EPS = 1e-7
 
-def gen_events(src_dir, targ_f, C=0.05):
+def gen_events(src_dir, targ_f, C=0.2):
+    print("running")
     fs = sorted(glob.glob(osp.join(src_dir, "*.png")))
     n_frames = len(fs)
-    frames = [cv2.imread(f, cv2.IMREAD_GRAYSCALE).astype(np.float32)/255 for f in tqdm.tqdm(fs, desc="loading images")]
+    # frames = [cv2.imread(f, cv2.IMREAD_GRAYSCALE).astype(np.float32)/255 for f in tqdm.tqdm(fs, desc="loading images")]
+    frames = [cv2.imread(f, cv2.IMREAD_UNCHANGED) for f in tqdm.tqdm(fs, desc="loading images")]
     event_file = h5py.File(targ_f, "w")
 
     x_out = event_file.create_dataset("x", (0, ), dtype=np.uint16, maxshape=(None, ))
@@ -92,6 +95,13 @@ def gen_events(src_dir, targ_f, C=0.05):
 
 
 if __name__ == "__main__":
-    frame_dir = "/scratch/matthew/projects/synth_datapipeline/synthetic_ev_scene/fine_frames/gamma"
-    targ_f = "rgb_events.hdf5"
+    parser = argparse.parser()
+    parser.add_argument("--frame_dir", default = "/scratch/matthew/projects/synth_datapipeline/synthetic_ev_scene/fine_frames/gamma")
+    parser.add_argument("--targ_f", default = "events.hdf5")
+    args =  parser.parse_args()
+
+    # frame_dir = "/scratch/matthew/projects/synth_datapipeline/synthetic_ev_scene/fine_frames/gamma"
+    # targ_f = "events.hdf5"
+    frame_dir = args.frame_dir
+    targ_f = args.targ_f
     gen_events(frame_dir, targ_f)
