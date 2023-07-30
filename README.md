@@ -11,3 +11,9 @@ simulated event data converters and processing scripts. See the readme in each f
 - raw synthetic data (robot only) -> nerfstudio format
 - nerfstudio format (robot only) -> enerf
 - nerfstudio format (any nerfstudio) -> enerf
+
+
+### instructions
+setup to run create\_dataset.sh
+- install vid2e
+- install nerfies
