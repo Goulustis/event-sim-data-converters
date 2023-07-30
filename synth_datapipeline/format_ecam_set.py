@@ -6,6 +6,7 @@ import os.path as osp
 import numpy as np
 import json
 import shutil
+import argparse
 
 def save_eimgs(eimgs, targ_dir):
     if eimgs is None:
@@ -69,25 +70,27 @@ def write_train_valid_split(eimgs_ids, targ_dir):
     with open(save_path, "w") as f:
         json.dump(dataset_json, f, indent=2)
 
-def main():
+def main(dst_dir,rgb_dir, evs_f, intrinsics_f, camspline_f, cam_mode="smooth"):
     #### inputs ###
-    targ_home = "synth_robo_col_evs"
-    src_dir = "synthetic_ev_scene"
-    cam_mode = "smooth"  # one of ['smooth', 'lerp']
-    # targ_home = "cat_plain_formatted"
-    # src_dir = "cat_plain"
+    # dst_dir = "synth_robo_col_evs"
+    # src_dir = "synthetic_ev_scene"
+    # cam_mode = "smooth"  # one of ['smooth', 'lerp']
     time_delta =  5000
+
+
     ###############
     # targ_dir = osp.join(targ_home, "/ecam_set")
     # rgb_dir = "synthetic_ev_scene/coarse_frames/gamma"
     # evs_f = "synthetic_ev_scene/events.hdf5"
     # intrinsics_f = "synthetic_ev_scene/intrinsics.json"
-    targ_dir = osp.join(targ_home, "ecam_set")
-    rgb_dir = osp.join(src_dir, "clear_coarse_frames/linear")
-    evs_f = osp.join(src_dir,"rgb_events.hdf5")
-    # evs_f = osp.join(src_dir,"robo_tex_gamma_events_4x.hdf5")
-    intrinsics_f = osp.join(src_dir, "intrinsics.json")
-    camspline_f = osp.join(src_dir, "camera_spline.npy")
+    # targ_dir = osp.join(dst_dir, "ecam_set")
+    # rgb_dir = osp.join(src_dir, "clear_coarse_frames/linear")
+    # evs_f = osp.join(src_dir,"rgb_events.hdf5")
+    # # evs_f = osp.join(src_dir,"robo_tex_gamma_events_4x.hdf5")
+    # intrinsics_f = osp.join(src_dir, "intrinsics.json")
+    # camspline_f = osp.join(src_dir, "camera_spline.npy")
+
+    targ_dir = dst_dir
     
     intrxs = read_intrinsics(intrinsics_f)
     cx, cy = intrxs[0,2], intrxs[1,2]
@@ -123,4 +126,18 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    ## assuming intrinsics to be the same as original robot scene
+    data_dir = osp.join(osp.dirname(osp.realpath(__file__)), "synthetic_ev_scene")
+    default_intrinsics_f = osp.join(data_dir, "intrinsics.json")
+    default_camspline_f = osp.join(data_dir, "camera_spline.npy")
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dst_dir", help="home directory of the dataset to be saved; save dir (eg .../scene/ecam_set)", default="")
+    parser.add_argument("--coarse_rgb_dir", help="directory containing color camera dataset images, use to determine gap to accumulate", default="")
+    parser.add_argument("--evs_f", help="event file to accumulate by", default="")
+    parser.add_argument("--intrinsics_f", help="intrinsics of the generated scene", default=default_intrinsics_f)
+    parser.add_argument("--camspline_f", help="synthetic robot camera spline format .npy", default=default_camspline_f)
+    parser.add_argument("--cam_mode", choices=["smooth", "lerp"],default="smooth")
+    args = parser.parse_args()
+
+    main(args.dst_dir, args.coarse_rgb_dir, args.evs_f, args.intrinsics_f, args.camspline_f, args.cam_mode)
