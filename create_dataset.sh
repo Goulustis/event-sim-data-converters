@@ -31,14 +31,14 @@ COARSE_FRAME_DIR=$(realpath $COARSE_FRAME_DIR)
 ### generate variables
 DST_EV_F=$DEST_DIR/event.hdf5
 
-# echo creating events ....
-# if [ "$SIMULATOR" = "esim" ]; then
-#     python evs_generators/gen_esim_evs/gen_evs.py --frame_dir $FRAME_DIR --targ_f $DST_EV_F --ev_thresh $EV_THRESH
-# elif [ "$SIMULATOR" = "dreb" ]; then
-#     python evs_generators/dreb_simulator/gen_events.py --frame_dir $FRAME_DIR --targ_f $DST_EV_F --ev_thresh $EV_THRESH
-# else
-#     echo "$SIMULATOR is not supported"
-# fi
+echo creating events ....
+if [ "$SIMULATOR" = "esim" ]; then
+    python evs_generators/gen_esim_evs/gen_evs.py --frame_dir $FRAME_DIR --targ_f $DST_EV_F --ev_thresh $EV_THRESH
+elif [ "$SIMULATOR" = "dreb" ]; then
+    python evs_generators/dreb_simulator/gen_events.py --frame_dir $FRAME_DIR --targ_f $DST_EV_F --ev_thresh $EV_THRESH
+else
+    echo "$SIMULATOR is not supported"
+fi
 
 
 cd synth_datapipeline
@@ -51,7 +51,7 @@ python format_col_set.py --dst_dir $DEST_DIR/colcam_set \
                          --coarse_rgb_dir $COARSE_FRAME_DIR \
                          --trig_ids_f $DEST_DIR/ecam_set/trig_ids.npy
 
-echo $EV_THRESH >> $DEST_DIR/ecam_set/eimgs/1x/ev_thresh.txt
+echo $EV_THRESH >> $DEST_DIR/ecam_set/eimgs/ev_thresh.txt
 
 cp $DEST_DIR/colcam_set/scene.json $DEST_DIR/ecam_set/
 cd $WORK_DIR
