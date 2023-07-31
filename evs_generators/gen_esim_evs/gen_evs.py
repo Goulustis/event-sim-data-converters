@@ -91,7 +91,8 @@ def main(frame_dir, targ_f, ev_thresh = 0.2, device="cuda"):
     # device = "cuda"
     # out_f = "hosp_carpet_events.hdf5"
     img_fs = sorted(glob.glob(osp.join(frame_dir, "*.png")))
-    img_ts = gen_colcam_triggers(frame_dir, scene_mode="carpet")
+    img_ts = gen_colcam_triggers(frame_dir, scene_mode="robo")
+    print(f"using total of {len(img_fs)} to generate events")
 
     event_file = h5py.File(targ_f, "w")
     out_dic = {}
