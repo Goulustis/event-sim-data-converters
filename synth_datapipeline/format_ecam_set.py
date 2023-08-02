@@ -119,7 +119,7 @@ def main(dst_dir,rgb_dir, evs_f, intrinsics_f, camspline_f, cam_mode="smooth"):
     np.save(osp.join(targ_dir, "trig_ids.npy"), trig_ids)
 
     # copy event to places
-    shutil.copyfile(evs_f, osp.join(targ_dir, osp.basename(evs_f)))
+    # shutil.copyfile(evs_f, osp.join(targ_dir, osp.basename(evs_f)))
 
     # create train valid split
     write_train_valid_split(eimgs_ids, targ_dir)
