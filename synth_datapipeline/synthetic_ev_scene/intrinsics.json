@@ -1,7 +1,7 @@
 {
-    "width": 1920,
-    "height": 1080,
-    "principal_point_x": 960.0,
-    "principal_point_y": 540.0,
-    "focal_length": 2160.0
+ "width": 2880,
+ "height": 1620,
+ "principal_point_x": 1440.0,
+ "principal_point_y": 810.0,
+ "focal_length": 3240.0
 }
