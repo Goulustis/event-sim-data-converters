@@ -1,10 +1,8 @@
 import glm
 import pygame as pg
-# from camera_data.camera_spline import CameraSpline
-from camera_data import CameraSpline, CarpetCameraSpline, camera_spline_dict
+from camera_data.camera_spline import CameraSpline
 import numpy as np
 from tqdm import tqdm
-from engine_configs import SCENE, MODE
 
 
 FOV = 50  # deg
@@ -76,7 +74,7 @@ class Camera:
 
 class PlayCamera(Camera):
     def __init__(self, app, position=(0, 0, 4), yaw=-90, pitch=0):
-        self.camera_spline = camera_spline_dict[SCENE]()
+        self.camera_spline = CameraSpline()
         self.triggers = np.loadtxt("camera_data/triggers.txt")
         self.trig_idx = 0
         self.near, self.far = 1e-3, 50
@@ -117,7 +115,7 @@ class PlayCamera(Camera):
     def update(self):
         self.update_camera_vectors()
         self.m_view = self.get_view_matrix()
-        
+    
     def move(self):
         pass
     

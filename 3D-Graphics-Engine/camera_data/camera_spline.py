@@ -3,15 +3,8 @@ import scipy
 import json
 
 cam_spline_path = "camera_data/camera_spline.npy"
-# intrinsics_path = "camera_data/render_intrinsics.json"
+intrinsics_path = "camera_data/ori_intrinsics.json"
 # intrinsics_path = "camera_data/intrinsics.json"
-# intrinsics_path = "camera_data/carpet_intrinsics.json"
-intrinsics_path = "camera_data/render_carpet_intrinsics.json"
-
-intrinsics_paths_dic = {"carpet_render": "camera_data/render_carpet_intrinsics.json", #{SCENE}_render intrinsics for experiment to deal with aliasing
-                        "robo_render" : "camera_data/render_intrinsics.json",
-                        "carpet_run": "camera_data/carpet_intrinsics.json",
-                        "robo_run":"camera_data/intrinsics.json"}
 
 
 def read_intrinsics(intrxs_path):
@@ -33,20 +26,20 @@ class CameraSpline:
         self.intrinsics = read_intrinsics(intrinsics_path)
         self.mode = mode
 
-        self.get_dir_fn_dic = {"smooth":self._get_dir_smooth,
-                               "lerp": self._get_dir_lerp}
+        self.get_dir_fn_dic = {"smooth":self.get_dir_smooth,
+                               "lerp": self.get_dir_lerp}
 
         self.get_dir_fn = self.get_dir_fn_dic[self.mode]
     
-    def _get_dir_smooth(self, times):
+    def get_dir_smooth(self, times):
         eye = np.stack(scipy.interpolate.splev(times, self.eyerep), axis=-1)
         target = np.stack(scipy.interpolate.splev(times, self.targetrep),
                           axis=-1)
         up = np.stack(scipy.interpolate.splev(times, self.uprep), axis=-1)
         return eye, target, up
 
-    def _get_dir_lerp(self, times):
-        steps = 48
+    def get_dir_lerp(self, times):
+        steps = 8
         t0 = np.floor(times * steps) / steps
         t1 = np.floor(times * steps + 1.0) / steps
         a = ((times - t0) / (t1 - t0))[..., None]

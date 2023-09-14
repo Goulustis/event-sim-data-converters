@@ -14,13 +14,9 @@ class Texture:
 
         self.textures["white"] = self.get_texture(path="textures/white.png")
         self.textures["black"] = self.get_texture(path="textures/black.png")
-        self.textures["rocks"] = self.get_texture(path="textures/rocks.png")
-        self.textures["carpet"] = self.get_texture(path="textures/carpet.png")
-        self.textures["ori_carpet"] = self.get_texture(path="textures/ori_carpet.jpg")
-        self.textures["grass"] = self.get_texture(path="textures/grass.png")
 
         self.textures['cat'] = self.get_texture(path='objects/cat/20430_cat_diff_v1.jpg')
-        self.textures["test"] = self.get_texture(path="textures/test.png")
+        # self.textures["robo"] = self.get_texture(path="objects/robo/robo_tex.jpg")
         self.textures['skybox'] = self.get_texture_cube(dir_path='textures/skybox1/', ext='png')
         self.textures['depth_texture'] = self.get_depth_texture()
 

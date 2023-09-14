@@ -5,19 +5,19 @@ import moderngl as mgl
 import sys
 from model import *
 from camera import Camera, PlayCamera
-from camera_data.camera_spline import read_intrinsics, intrinsics_paths_dic
+from camera_data.camera_spline import read_intrinsics, intrinsics_path
 from light import Light
 from mesh import Mesh
-from scene import Scene, CarpetScene, scene_cls_dict
+from scene import Scene
 from scene_renderer import SceneRenderer
 from OpenGL.GL import *
 from PIL import Image
 from tqdm import tqdm
 import shutil
-from engine_configs import SCENE, MODE
+import argparse
 
 class GraphicsEngine:
-    def __init__(self, win_size=(1600, 900), scene_cls=Scene):
+    def __init__(self, win_size=(1600, 900)):
         # init pygame modules
         pg.init()
         # window size
@@ -42,11 +42,12 @@ class GraphicsEngine:
         # light
         self.light = Light(position=(-3,2,2))
         # camera
-        self.camera = Camera(self)
+        # self.camera = Camera(self)
+        self.camera = PlayCamera(self)
         # mesh
         self.mesh = Mesh(self)
         # scene
-        self.scene = scene_cls(self)
+        self.scene = Scene(self)
         # renderer
         self.scene_renderer = SceneRenderer(self)
 
@@ -81,16 +82,42 @@ class GraphicsEngine:
             self.delta_time = self.clock.tick(120)
 
 
-class SimulatorEngine(GraphicsEngine):
-    def __init__(self, win_size=(1600, 900), scene_cls = Scene, save_frame_dir = "dev_frames", save_mem=True):
-        super().__init__(win_size, scene_cls)
-
+class SimulatorEngine:
+    def __init__(self, win_size=(1600, 900), save_frame_dir = "dev_frames", save_mem=True):
+        # init pygame modules
+        pg.init()
+        # window size
+        self.WIN_SIZE = win_size
         self.save_winsize = (win_size[0]//2, win_size[1]//2)
+
+
+        # set opengl attr
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 3)
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, 3)
+        pg.display.gl_set_attribute(pg.GL_CONTEXT_PROFILE_MASK, pg.GL_CONTEXT_PROFILE_CORE)
+        # create opengl context
+        # pg.display.set_mode(self.WIN_SIZE, flags=pg.OPENGL | pg.DOUBLEBUF | pg.HIDDEN)
+        pg.display.set_mode(self.WIN_SIZE, flags=pg.OPENGL | pg.DOUBLEBUF)
+        # mouse settings
+        pg.event.set_grab(False)
+        pg.mouse.set_visible(True)
+        
+        
+        # detect and use existing opengl context
+        self.ctx = mgl.create_context()
+        # self.ctx.front_face = 'cw'
+        self.ctx.enable(flags=mgl.DEPTH_TEST | mgl.CULL_FACE)
+        self.time = 0
+        self.delta_time = 0
+        # light
+        self.light = Light(position=(-3,2,2))
+        # camera
+        # self.camera = Camera(self)
         self.camera = PlayCamera(self)
         # mesh
         self.mesh = Mesh(self)
         # scene
-        self.scene = scene_cls(self)
+        self.scene = Scene(self)
         # renderer
         self.scene_renderer = SceneRenderer(self)
 
@@ -154,11 +181,15 @@ class SimulatorEngine(GraphicsEngine):
 
 
 if __name__ == '__main__':
-    fx, fy, cx, cy = read_intrinsics(intrinsics_paths_dic[f"{SCENE}_{MODE}".lower()])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--outdir", default="generated_imgs/dev")
+    args = parser.parse_args()
+    fx, fy, cx, cy = read_intrinsics(intrinsics_path)
     win_size = (int(cx*2), int(cy*2))
-
-    if MODE == "run":
-        app = GraphicsEngine(win_size=win_size, scene_cls=scene_cls_dict[SCENE])
-    elif MODE == "render":
-        app = SimulatorEngine(win_size=win_size, scene_cls=scene_cls_dict[SCENE], save_frame_dir="generated_imgs/cat_simple_2048")
+    # app = GraphicsEngine(win_size=win_size)
+    # app = SimulatorEngine(win_size=win_size, save_frame_dir="generated_imgs/carpet_tex_2048")
+    app = SimulatorEngine(win_size=win_size, save_frame_dir=args.outdir)
     app.run()
+
+
+

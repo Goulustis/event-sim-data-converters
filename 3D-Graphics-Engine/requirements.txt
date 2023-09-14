@@ -3,7 +3,3 @@ numpy
 pygame
 PyGLM
 pywavefront
-scipy
-tqdm
-pyopengl
-pillow
