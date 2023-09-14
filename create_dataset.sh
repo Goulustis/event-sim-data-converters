@@ -1,12 +1,12 @@
 
 set -e
-
+scene_name=carpet_checker
 ### params #######
-FRAME_DIR=/home/hunter/projects/3D-Graphics-Engine/generated_imgs/cat_simple
+FRAME_DIR=/home/hunter/scratch/3D-Graphics-Engine/generated_imgs/$scene_name
 SIMULATOR=esim #[one of esim, dreb]
 EV_THRESH=0.2
-DEST_DIR=formatted_data/cat_simple
-COARSE_FRAME_DIR=/home/hunter/projects/3D-Graphics-Engine/generated_imgs/cat_simple_256
+DEST_DIR=formatted_data/$scene_name
+COARSE_FRAME_DIR=/home/hunter/scratch/3D-Graphics-Engine/generated_imgs/${scene_name}_256
 ####################
 
 WORK_DIR=$(pwd)
@@ -16,7 +16,7 @@ which python
 
 if [ ! -d "$COARSE_FRAME_DIR" ]; then
     echo creating coarse frames
-    FRAME_DIR_2=/home/hunter/projects/3D-Graphics-Engine/generated_imgs/cat_simple_2048   # PARAMS NEEDED TO CREATE COARSE_FRAME
+    FRAME_DIR_2=/home/hunter/scratch/3D-Graphics-Engine/generated_imgs/${scene_name}_2048   # PARAMS NEEDED TO CREATE COARSE_FRAME
     python synth_datapipeline/misc_tasks.py --src_dir $FRAME_DIR_2 --dst_dir $COARSE_FRAME_DIR
 fi
 
@@ -31,10 +31,12 @@ COARSE_FRAME_DIR=$(realpath $COARSE_FRAME_DIR)
 ### generate variables
 DST_EV_F=$DEST_DIR/event.hdf5
 
-echo creating events ....
+echo checking gen evs
 if [ "$SIMULATOR" = "esim" ]; then
+    echo creating evs with esim api
     python evs_generators/gen_esim_evs/gen_evs.py --frame_dir $FRAME_DIR --targ_f $DST_EV_F --ev_thresh $EV_THRESH
 elif [ "$SIMULATOR" = "dreb" ]; then
+    echo creating evs with dreb emulator
     python evs_generators/dreb_simulator/gen_events.py --frame_dir $FRAME_DIR --targ_f $DST_EV_F --ev_thresh $EV_THRESH
 else
     echo "$SIMULATOR is not supported"
