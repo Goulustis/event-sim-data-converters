@@ -2,18 +2,21 @@ import numpy as np
 import scipy
 import json
 
-cam_spline_path = "camera_data/camera_spline.npy"
-intrinsics_path = "camera_data/ori_intrinsics.json"
+# cam_spline_path = "camera_data/camera_spline.npy"
+# intrinsics_path = "camera_data/ori_intrinsics.json"
+cam_spline_path = "../synth_datapipeline/synthetic_ev_scene/camera_spline.npy"
+intrinsics_path = "../synth_datapipeline/synthetic_ev_scene/intrinsics.json"
+
 # intrinsics_path = "camera_data/intrinsics.json"
 
 
-def read_intrinsics(intrxs_path):
+def read_intrinsics(intrxs_path, mult_factor = 2):
     with open(intrxs_path, "r") as f:
         data = json.load(f)
 
-    cx = data["principal_point_x"]
-    cy = data["principal_point_y"]
-    fx = fy = data["focal_length"]
+    cx = data["principal_point_x"]*mult_factor
+    cy = data["principal_point_y"]*mult_factor
+    fx = fy = data["focal_length"]*mult_factor
 
     return fx, fy, cx, cy
 
