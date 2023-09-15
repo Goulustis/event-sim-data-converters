@@ -1,22 +1,24 @@
 
 set -e
-scene_name=carpet_checker
+scene_name=cat_fancy
 ### params #######
-FRAME_DIR=/home/hunter/scratch/3D-Graphics-Engine/generated_imgs/$scene_name
+FRAME_DIR=3D-Graphics-Engine/generated_imgs/${scene_name}_4096
 SIMULATOR=esim #[one of esim, dreb]
 EV_THRESH=0.2
 DEST_DIR=formatted_data/$scene_name
-COARSE_FRAME_DIR=/home/hunter/scratch/3D-Graphics-Engine/generated_imgs/${scene_name}_256
+COARSE_FRAME_DIR=3D-Graphics-Engine/generated_imgs/${scene_name}_256
 ####################
 
 WORK_DIR=$(pwd)
+FRAME_DIR=$(realpath $FRAME_DIR)
+COARSE_FRAME_DIR=$(realpath $COARSE_FRAME_DIR)
 
 # mamba activate vid2e
 which python
 
 if [ ! -d "$COARSE_FRAME_DIR" ]; then
     echo creating coarse frames
-    FRAME_DIR_2=/home/hunter/scratch/3D-Graphics-Engine/generated_imgs/${scene_name}_2048   # PARAMS NEEDED TO CREATE COARSE_FRAME
+    FRAME_DIR_2=$(dirname $FRAME_DIR)/${scene_name}_2048   # PARAMS NEEDED TO CREATE COARSE_FRAME
     python synth_datapipeline/misc_tasks.py --src_dir $FRAME_DIR_2 --dst_dir $COARSE_FRAME_DIR
 fi
 
