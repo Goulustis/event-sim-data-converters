@@ -16,6 +16,11 @@ from tqdm import tqdm
 import shutil
 import argparse
 
+import cv2
+
+from config_cnsts import ALIAS_SCALE
+
+USE_UINT8 = True
 class GraphicsEngine:
     def __init__(self, win_size=(1600, 900)):
         # init pygame modules
@@ -88,8 +93,7 @@ class SimulatorEngine:
         pg.init()
         # window size
         self.WIN_SIZE = win_size
-        self.save_winsize = (win_size[0]//2, win_size[1]//2)
-
+        self.save_winsize = (win_size[0]//ALIAS_SCALE, win_size[1]//ALIAS_SCALE)
 
         # set opengl attr
         pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 3)
@@ -159,9 +163,17 @@ class SimulatorEngine:
             self.save_all_imgs()
     
     def save_img(self, frame:np.ndarray, path:str):
-        img = Image.fromarray(frame).convert('L')
-        img = img.resize(self.save_winsize, resample=Image.LANCZOS)
-        img.save(path)
+        # if USE_UINT8:
+        #     frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+        # frame = cv2.resize(frame, (self.save_winsize), interpolation=cv2.INTER_LANCZOS4)
+        frame = cv2.resize(frame, (self.save_winsize), interpolation=cv2.INTER_AREA)
+        frame = frame[...,::-1]
+        cv2.imwrite(path, frame)
+        # mode = "I;16" if frame.dtype == np.uint16 else "RGB"
+        # img = Image.fromarray(frame, mode) #.convert('L')
+        # img = img.resize(self.save_winsize, resample=Image.LANCZOS)
+        # img.save(path)
+        
     
     def save_all_imgs(self, targ_dir=None):
         if targ_dir is None:
@@ -174,8 +186,12 @@ class SimulatorEngine:
 
 
     def get_img(self):
-        image_buffer = glReadPixels(0, 0, self.WIN_SIZE[0], self.WIN_SIZE[1], OpenGL.GL.GL_RGB, OpenGL.GL.GL_UNSIGNED_BYTE)
-        image = np.frombuffer(image_buffer, dtype=np.uint8).reshape(self.WIN_SIZE[1], self.WIN_SIZE[0], 3)
+        if USE_UINT8:
+            image_buffer = glReadPixels(0, 0, self.WIN_SIZE[0], self.WIN_SIZE[1], OpenGL.GL.GL_RGB, OpenGL.GL.GL_UNSIGNED_BYTE)
+            image = np.frombuffer(image_buffer, dtype=np.uint8).reshape(self.WIN_SIZE[1], self.WIN_SIZE[0], 3)
+        else:
+            image_buffer = glReadPixels(0, 0, self.WIN_SIZE[0], self.WIN_SIZE[1], OpenGL.GL.GL_RGB, OpenGL.GL.GL_UNSIGNED_SHORT)
+            image = np.frombuffer(image_buffer, dtype=np.uint16).reshape(self.WIN_SIZE[1], self.WIN_SIZE[0], 3)
         return image[::-1,::-1]
 
 
@@ -184,12 +200,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--outdir", default="generated_imgs/dev")
     args = parser.parse_args()
+
+    USE_UINT8 = False
+
     fx, fy, cx, cy = read_intrinsics(intrinsics_path)
     win_size = (int(cx*2), int(cy*2))
     # app = GraphicsEngine(win_size=win_size)
     # app = SimulatorEngine(win_size=win_size, save_frame_dir="generated_imgs/carpet_tex_2048")
     app = SimulatorEngine(win_size=win_size, save_frame_dir=args.outdir)
     app.run()
-
-
 

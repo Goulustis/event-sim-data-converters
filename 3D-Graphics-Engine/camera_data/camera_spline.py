@@ -1,6 +1,7 @@
 import numpy as np
 import scipy
 import json
+from config_cnsts import ALIAS_SCALE
 
 # cam_spline_path = "camera_data/camera_spline.npy"
 # intrinsics_path = "camera_data/ori_intrinsics.json"
@@ -10,7 +11,7 @@ intrinsics_path = "../synth_datapipeline/synthetic_ev_scene/intrinsics.json"
 # intrinsics_path = "camera_data/intrinsics.json"
 
 
-def read_intrinsics(intrxs_path, mult_factor = 2):
+def read_intrinsics(intrxs_path, mult_factor = ALIAS_SCALE):
     with open(intrxs_path, "r") as f:
         data = json.load(f)
 
