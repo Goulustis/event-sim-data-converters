@@ -99,15 +99,16 @@ def main(frame_dir, targ_f, ev_thresh = 0.2, device="cuda"):
     for k, v in dtype_dic.items():
         out_dic[k] = event_file.create_dataset(k, (0,), dtype=v, maxshape=(None,))
 
-    imgs = np.stack(parallel_map(lambda x : cv2.imread(x, cv2.IMREAD_GRAYSCALE), img_fs))
+    imgs = np.stack(parallel_map(lambda x : cv2.cvtColor(cv2.imread(x, cv2.IMREAD_UNCHANGED), cv2.COLOR_BGR2GRAY), img_fs, show_pbar=True, desc="loading imgs"))
 
     esim = esim_torch.ESIM(contrast_threshold_neg=ev_thresh, contrast_threshold_pos=ev_thresh)
     data_iter = batchify(imgs, img_ts, batch_size=32)
     data_dic = {}
 
+    norm_factor = np.iinfo(imgs.dtype).max
     for batch in tqdm(data_iter, desc="generating"):
         b_imgs, b_ts = batch
-        log_imgs, b_ts = torch.from_numpy(np.log(b_imgs/255 + 1e-4)).float().to(device), torch.from_numpy(b_ts.astype(int)).to(device)
+        log_imgs, b_ts = torch.from_numpy(np.log(b_imgs/norm_factor + 1e-4)).float().to(device), torch.from_numpy(b_ts.astype(int)).to(device)
         evs = esim.forward(log_imgs, b_ts)
 
         if evs is None:
