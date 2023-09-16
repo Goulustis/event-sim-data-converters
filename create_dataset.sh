@@ -58,4 +58,14 @@ python format_col_set.py --dst_dir $DEST_DIR/colcam_set \
 echo $EV_THRESH >> $DEST_DIR/ecam_set/eimgs/ev_thresh.txt
 
 cp $DEST_DIR/colcam_set/scene.json $DEST_DIR/ecam_set/
+
+cd $DEST_DIR
+cp -r colcam_set clear_linear_colcam_set
+cp -r colcam_set clear_gamma_colcam_set
+cp -r colcam_set blur_linear_colcam_set
+cp -r colcam_set blur_gamma_colcam_set
+
+cd -
+python create_gamma_and_blur.py --dataset_dir $DEST_DIR --src_img_dir $FRAME_DIR
+
 cd $WORK_DIR
