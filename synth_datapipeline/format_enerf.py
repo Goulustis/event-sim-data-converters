@@ -2,7 +2,7 @@ import json
 import numpy as np
 import os
 import os.path as osp
-from utils import read_evs_h5, gen_colcam_triggers, read_intrinsics
+from utils import read_evs_h5, gen_colcam_triggers, read_intrinsics, EventBuffer
 from tqdm import tqdm
 import shutil
 import cv2
@@ -34,31 +34,63 @@ ROBO_CENTER = [-8.30339975, 18.90998993, 58.92599333]  # center of robot scene
 #         dst_f = osp.join(dst_ev_dir, f"{str(i).zfill(4)}.npy")
 #         np.save(dst_f, ev_batch)
 
+# def format_events(src_dir, dst_dir, triggers, ev_f = None):
+#     triggers = triggers * 1000
+#     ev_f = osp.join(src_dir,"ecam_set", "events.hdf5") if ev_f is None else ev_f
+#     dst_ev_dir = osp.join(dst_dir, "events")
+#     os.makedirs(dst_ev_dir, exist_ok=True)
+
+#     evs_ori = read_evs_h5(ev_f)
+#     evs = np.stack([evs_ori['x'],evs_ori['y'], evs_ori['t']*1000, evs_ori['p']], axis = -1)
+#     cond = evs[:, 3] == 0
+#     evs[cond, 3] = -1
+#     evs_batches = []
+#     triggers[-1] = evs[-1,2]
+
+#     ts = evs_ori["t"]*1000
+#     for i in tqdm(range(len(triggers)-1), desc='batching evs'):
+#         st_t, end_t = triggers[i], triggers[i+1]
+#         cond = (ts >= st_t) & (ts <= end_t)
+#         evs_batches.append(evs[cond])
+    
+#     evs_batches.append(evs[triggers[-1] <= ts])
+    
+    
+#     for i, ev_batch in tqdm(enumerate(evs_batches), total = len(evs_batches), desc="saving evs"):
+#         dst_f = osp.join(dst_ev_dir, f"{str(i).zfill(4)}.npy")
+#         np.save(dst_f, ev_batch)
+
 def format_events(src_dir, dst_dir, triggers, ev_f = None):
     triggers = triggers * 1000
     ev_f = osp.join(src_dir,"ecam_set", "events.hdf5") if ev_f is None else ev_f
     dst_ev_dir = osp.join(dst_dir, "events")
     os.makedirs(dst_ev_dir, exist_ok=True)
 
-    evs_ori = read_evs_h5(ev_f)
-    evs = np.stack([evs_ori['x'],evs_ori['y'], evs_ori['t']*1000, evs_ori['p']], axis = -1)
-    cond = evs[:, 3] == 0
-    evs[cond, 3] = -1
+    # evs_ori = read_evs_h5(ev_f)
+    # evs = np.stack([evs_ori['x'],evs_ori['y'], evs_ori['t']*1000, evs_ori['p']], axis = -1)
+    evs_ori = EventBuffer(ev_f)
+    # cond = evs[:, 3] == 0
+    # evs[cond, 3] = -1
     evs_batches = []
-    triggers[-1] = evs[-1,2]
+    triggers[-1] = evs_ori.t_f[-1] #evs[-1,2]
 
-    ts = evs_ori["t"]*1000
+    batch_cnt = 0
     for i in tqdm(range(len(triggers)-1), desc='batching evs'):
         st_t, end_t = triggers[i], triggers[i+1]
-        cond = (ts >= st_t) & (ts <= end_t)
-        evs_batches.append(evs[cond])
+        # cond = (ts >= st_t) & (ts <= end_t)
+        ret_t, ret_x, ret_y, ret_p = evs_ori.retrieve_data(st_t/1000, end_t/1000)
+        
+        evs_batch = np.stack([ret_x, ret_y, ret_t*1000, ret_p], axis=-1)
+
+        dst_f = osp.join(dst_ev_dir, f"{str(batch_cnt).zfill(4)}.npy")
+        np.save(dst_f, evs_batch)
     
-    evs_batches.append(evs[triggers[-1] <= ts])
+    # evs_batches.append(evs[triggers[-1] <= ts])
     
     
-    for i, ev_batch in tqdm(enumerate(evs_batches), total = len(evs_batches), desc="saving evs"):
-        dst_f = osp.join(dst_ev_dir, f"{str(i).zfill(4)}.npy")
-        np.save(dst_f, ev_batch)
+    # for i, ev_batch in tqdm(enumerate(evs_batches), total = len(evs_batches), desc="saving evs"):
+    #     dst_f = osp.join(dst_ev_dir, f"{str(i).zfill(4)}.npy")
+    #     np.save(dst_f, ev_batch)
 
 
 def resize_and_save_img_dir(src_dir, dst_dir, scale=1):
@@ -193,14 +225,14 @@ def create_poses_bounds(rgb_dir, intrinsic_f, scene_f, dst_dir, scale=1):
     print(f"saved to {dst_f}")
 
 def main():
-    src_dir = "synth_robo"
+    src_dir = None #"synth_robo"
     # dst_dir = "enerf_robo_gamma_4x"
-    dst_dir = "/scratch/matthew/projects/enerf/data/enerf_robo_v3"
-    rgb_dir = "synthetic_ev_scene/clear_coarse_frames/linear"
-    blur_rgb_dir = "synthetic_ev_scene/coarse_frames/linear"
+    dst_dir = "/scratch/matthew/projects/archived/enerf/data/tex_robo_enerf"
+    rgb_dir = "/ubc/cs/research/kmyi/matthew/backup_copy/synth_datapipeline/synthetic_ev_scene_tex/clear_coarse_frames/linear"
+    blur_rgb_dir = "/ubc/cs/research/kmyi/matthew/backup_copy/synth_datapipeline/synthetic_ev_scene_tex/coarse_frames/linear"
     intrx_f = "synthetic_ev_scene/intrinsics.json"
     scene_f = "synth_robo/colcam_set/scene.json"
-    ev_f = "synthetic_ev_scene/robo_events_gamma_4x.hdf5"
+    ev_f = "/ubc/cs/research/kmyi/matthew/backup_copy/synth_datapipeline/synthetic_ev_scene_tex/events.hdf5"
     scale = 1  # dim to reduce by from original images, (eg. scale=2, new_img_size = (H//2, W//2), focal length// 2)
 
     os.makedirs(dst_dir, exist_ok=True)
