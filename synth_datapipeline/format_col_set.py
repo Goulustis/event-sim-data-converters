@@ -267,7 +267,7 @@ if __name__ == "__main__":
     parser.add_argument("--cam_mode", choices=["smooth", "lerp"],default="smooth")
     args = parser.parse_args()
 
-    if args.trig_id_f is None:
+    if args.trig_ids_f is None:
         scene_path = osp.join(osp.dirname(args.dst_dir), "ecam_set", "trig_ids.npy")
 
-    main(args.dst_dir, args.coarse_rgb_dir, args.intrinscis_f, args.camspline_f, args.trig_ids_f, args.cam_mode)
+    main(args.dst_dir, args.coarse_rgb_dir, args.intrinsics_f, args.camspline_f, args.trig_ids_f, args.cam_mode)

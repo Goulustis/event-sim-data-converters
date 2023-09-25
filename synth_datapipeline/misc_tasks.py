@@ -46,24 +46,47 @@ def reformate_event_h5():
 
     print("done")
 
+# def evs_to_img(evs:np.ndarray, abs = True):
+#     evs = evs.squeeze()
+#     if len(evs.shape) == 2:
+#         evs = evs[None]
+
+#     frames = np.zeros((*evs.shape, 3), dtype=np.uint8)
+#     pos_loc = evs > 0
+#     neg_loc = evs < 0
+
+#     if abs:
+#         frames[pos_loc, 1] = 255
+#         frames[neg_loc, 0] = 255
+#     else:
+#         to_uint8 = lambda x : (x/x.max() * 255).astype(np.uint8)
+#         pos_evs, neg_evs = evs[pos_loc], np.abs(evs[neg_loc])
+#         pos_evs, neg_evs = to_uint8(pos_evs), to_uint8(neg_evs)
+#         frames[pos_loc, 1] = pos_evs
+#         frames[neg_loc, 0] = neg_evs
+
+#     return frames
+
 def evs_to_img(evs:np.ndarray, abs = True):
     evs = evs.squeeze()
     if len(evs.shape) == 2:
         evs = evs[None]
 
     frames = np.zeros((*evs.shape, 3), dtype=np.uint8)
-    pos_loc = evs > 0
-    neg_loc = evs < 0
 
-    if abs:
-        frames[pos_loc, 1] = 255
-        frames[neg_loc, 0] = 255
-    else:
-        to_uint8 = lambda x : (x/x.max() * 255).astype(np.uint8)
-        pos_evs, neg_evs = evs[pos_loc], np.abs(evs[neg_loc])
-        pos_evs, neg_evs = to_uint8(pos_evs), to_uint8(neg_evs)
-        frames[pos_loc, 1] = pos_evs
-        frames[neg_loc, 0] = neg_evs
+    for i, ev in tqdm(enumerate(evs), total=len(evs)):
+        pos_loc = ev > 0
+        neg_loc = ev < 0
+
+        if abs:
+            frames[i, pos_loc, 1] = 255
+            frames[i, neg_loc, 0] = 255
+        else:
+            to_uint8 = lambda x : (x/x.max() * 255).astype(np.uint8)
+            pos_evs, neg_evs = ev[pos_loc], np.abs(ev[neg_loc])
+            pos_evs, neg_evs = to_uint8(pos_evs), to_uint8(neg_evs)
+            frames[i, pos_loc, 1] = pos_evs
+            frames[i, neg_loc, 0] = neg_evs
 
     return frames
 
@@ -231,9 +254,9 @@ def write_num(frame, number):
 
 def create_ev_vid(add_frame_num=True):
     # eimg_f = "/scratch/matthew/projects/e-nerf_synth_datapipeline/cat_lerp_carpet_formatted/ecam_set/eimgs/eimgs_1x.npy"
-    eimg_f = "/scratch/matthew/projects/e-nerf_synth_datapipeline/adapt_carpet_enerf/ecam_set/eimgs/eimgs_1x.npy"
+    eimg_f = "/home/hunter/projects/event-sim-data-converters/formatted_data/cat_simple/ecam_set/eimgs/eimgs_1x.npy"
     print("creating eimg vid")
-    ev_vid = evs_to_img(np.load(eimg_f))
+    ev_vid = evs_to_img(np.load(eimg_f, "r"))
     if add_frame_num:
         for i, frame in enumerate(ev_vid):
             ev_vid[i] = write_num(frame, i)

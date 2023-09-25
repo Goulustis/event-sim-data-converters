@@ -1,0 +1,1 @@
+ALIAS_SCALE=4  #scale to downsample from

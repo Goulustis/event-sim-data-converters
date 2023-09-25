@@ -17,3 +17,6 @@ simulated event data converters and processing scripts. See the readme in each f
 setup to run create\_dataset.sh
 - install vid2e
 - install nerfies
+
+### scene generation
+A scene can be generated with this [game engine](https://github.com/Goulustis/3D-Graphics-Engine/tree/old_scene)
