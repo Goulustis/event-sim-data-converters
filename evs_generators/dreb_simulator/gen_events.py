@@ -13,7 +13,7 @@ def gen_events(src_dir, targ_f, C=0.2):
     fs = sorted(glob.glob(osp.join(src_dir, "*.png")))
     n_frames = len(fs)
     # frames = [cv2.imread(f, cv2.IMREAD_GRAYSCALE).astype(np.float32)/255 for f in tqdm.tqdm(fs, desc="loading images")]
-    frames = [cv2.imread(f, cv2.IMREAD_UNCHANGED) for f in tqdm.tqdm(fs, desc="loading images")]
+    frames = [cv2.imread(f, cv2.IMREAD_UNCHANGED).astype(float) for f in tqdm.tqdm(fs, desc="loading images")]
     event_file = h5py.File(targ_f, "w")
 
     x_out = event_file.create_dataset("x", (0, ), dtype=np.uint16, maxshape=(None, ))
