@@ -84,6 +84,7 @@ def format_events(src_dir, dst_dir, triggers, ev_f = None):
 
         dst_f = osp.join(dst_ev_dir, f"{str(batch_cnt).zfill(4)}.npy")
         np.save(dst_f, evs_batch)
+        batch_cnt += 1
     
     # evs_batches.append(evs[triggers[-1] <= ts])
     
