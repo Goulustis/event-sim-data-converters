@@ -78,18 +78,16 @@ def main():
     ev_buffer = np.load(event_f, "r")
     img_fs = sorted(glob.glob(osp.join(img_dir ,"*.png")))
 
-
+    delta_idx = int(len(ev_buffer)//(len(img_fs) - 1))
     e_threshes = np.zeros((len(img_fs)-1, *cv2.imread(img_fs[0]).shape[:2]), dtype=np.float16)
     for i in tqdm(range(len(img_fs)-1)):
-        img1, img2 = cv2.imread(img_fs[i], cv2.IMREAD_UNCHANGED), cv2.imread(img_fs[i+1], cv2.IMREAD_UNCHANGED)
-        # img1, img2 = cv2.imread(img_fs[i]), cv2.imread(img_fs[i+1])
+        img1, img2 = cv2.imread(img_fs[i]), cv2.imread(img_fs[i+1])
         img1, img2 = prep_img(img1), prep_img(img2)
 
 
-        delta_idx = int(len(ev_buffer)//(len(img_fs) - 1))
         events = ev_buffer[i*delta_idx : (i+1)*delta_idx].sum(axis=0)
-        thresh_est = estimate_threshold(img1, img2, events)
-        e_threshes[i] = thresh_est
+        thresh_est = estimate_threshold(img1, img2, events) * ev_buffer[i*delta_idx : (i+1)*delta_idx]
+        e_threshes[i*delta_idx : (i+1)*delta_idx] = thresh_est
     
     np.save(dst_f, e_threshes)
 
