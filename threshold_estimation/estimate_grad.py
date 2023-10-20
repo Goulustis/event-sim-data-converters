@@ -21,7 +21,6 @@ def estimate_threshold(img1, img2, events, n_step = 2500):
     ts, xs, ys, ps = events
 
     ev_img = np.zeros(img1.shape)
-
     np.add.at(ev_img, (ys, xs), ps)
     
 
@@ -76,9 +75,9 @@ def main():
     img_fs = sorted(glob.glob(osp.join(img_dir ,"*.png")))
 
 
-    e_threshes = np.zeros((len(img_fs)-1, *cv2.imread(img_fs[0]).shape[:2]))
+    e_threshes = np.zeros((len(img_fs)-2, *cv2.imread(img_fs[0]).shape[:2]))
 
-    for i in tqdm(range(len(img_fs)-1)):
+    for i in tqdm(range(len(img_fs)-2)):
         img1, img2 = cv2.imread(img_fs[i], cv2.IMREAD_UNCHANGED), cv2.imread(img_fs[i+1], cv2.IMREAD_UNCHANGED)
         img1, img2 = prep_img(img1), prep_img(img2)
 
