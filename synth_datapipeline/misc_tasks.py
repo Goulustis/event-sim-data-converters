@@ -167,7 +167,7 @@ def create_clear_coarse_paramed(src_dir, dst_dir, gap_size=8):
     print("done clear coarse")
 
     img_fs = np.array(sorted(glob.glob(osp.join(src_dir, "*.png"))))
-    mv_idxs = np.array(list(range(len(img_fs))))[st_idx:][::gap_size]
+    mv_idxs = np.array(list(range(len(img_fs))))[st_idx::gap_size]
     mv_img_fs = img_fs[mv_idxs]
     targ_dir = dst_dir
     cp_files(mv_img_fs, targ_dir)
