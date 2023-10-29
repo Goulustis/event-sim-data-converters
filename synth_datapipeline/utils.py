@@ -67,10 +67,10 @@ def read_point_clouds(file_path):
     return np.stack(points)
 
 def read_evs_h5(file_path="synthetic_ev_scene/events.hdf5"):
-    print("loading hdf5")
+    print("loading hdf5 slow")
     with h5py.File(file_path, "r") as f:
         xs,ys,ts,ps = [f[e][:] for e in list("xytp")]
-        
+    print("done loading")    
     return {"x": xs, "y":ys, "t":ts, "p":ps}
 
 

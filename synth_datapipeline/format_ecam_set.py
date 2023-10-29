@@ -72,22 +72,17 @@ def write_train_valid_split(eimgs_ids, targ_dir):
 
 def main(dst_dir,rgb_dir, evs_f, intrinsics_f, camspline_f, cam_mode="smooth"):
     #### inputs ###
-    # dst_dir = "synth_robo_col_evs"
-    # src_dir = "synthetic_ev_scene"
+    # dst_dir = "tmp_dir/robo_tex_0.15"
+    # src_dir = "synth_datapipeline/synthetic_ev_scene_tex"
     # cam_mode = "smooth"  # one of ['smooth', 'lerp']
-    time_delta =  5000
+    # time_delta =  5000
 
 
-    ###############
-    # targ_dir = osp.join(targ_home, "/ecam_set")
-    # rgb_dir = "synthetic_ev_scene/coarse_frames/gamma"
-    # evs_f = "synthetic_ev_scene/events.hdf5"
+    # ###############
     # intrinsics_f = "synthetic_ev_scene/intrinsics.json"
     # targ_dir = osp.join(dst_dir, "ecam_set")
     # rgb_dir = osp.join(src_dir, "clear_coarse_frames/linear")
-    # evs_f = osp.join(src_dir,"rgb_events.hdf5")
-    # # evs_f = osp.join(src_dir,"robo_tex_gamma_events_4x.hdf5")
-    # intrinsics_f = osp.join(src_dir, "intrinsics.json")
+    # evs_f = osp.join(src_dir,"events.hdf5")
     # camspline_f = osp.join(src_dir, "camera_spline.npy")
 
     targ_dir = dst_dir
