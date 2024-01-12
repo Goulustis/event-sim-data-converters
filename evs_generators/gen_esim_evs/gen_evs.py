@@ -91,7 +91,8 @@ def main(frame_dir, targ_f, ev_thresh = 0.2, device="cuda"):
     # device = "cuda"
     # out_f = "hosp_carpet_events.hdf5"
     img_fs = sorted(glob.glob(osp.join(frame_dir, "*.png")))
-    img_ts = gen_colcam_triggers(frame_dir, scene_mode="robo")
+    # img_ts = gen_colcam_triggers(frame_dir, scene_mode="robo")
+    img_ts = np.loadtxt("/home/hunter/projects/ev_sim_converters/3D-Graphics-Engine/camera_data/triggers2048.txt")
     print(f"using total of {len(img_fs)} to generate events")
 
     event_file = h5py.File(targ_f, "w")
@@ -99,16 +100,21 @@ def main(frame_dir, targ_f, ev_thresh = 0.2, device="cuda"):
     for k, v in dtype_dic.items():
         out_dic[k] = event_file.create_dataset(k, (0,), dtype=v, maxshape=(None,))
 
-    imgs = np.stack(parallel_map(lambda x : cv2.cvtColor(cv2.imread(x, cv2.IMREAD_UNCHANGED), cv2.COLOR_BGR2GRAY), img_fs, show_pbar=True, desc="loading imgs"))
+    if len(cv2.imread(img_fs[0], cv2.IMREAD_UNCHANGED).shape) == 3:
+        read_fn = lambda x : cv2.cvtColor(cv2.imread(x, cv2.IMREAD_UNCHANGED), cv2.COLOR_BGR2GRAY)
+    else:
+        read_fn = lambda x : cv2.imread(x, cv2.IMREAD_UNCHANGED)
+    imgs = np.stack(parallel_map(read_fn, img_fs, show_pbar=True, desc="loading imgs"))
 
+    # esim = esim_torch.ESIM(contrast_threshold_neg=ev_thresh, contrast_threshold_pos=ev_thresh, refractory_period_ns=100)
     esim = esim_torch.ESIM(contrast_threshold_neg=ev_thresh, contrast_threshold_pos=ev_thresh)
+    # data_iter = batchify(imgs, img_ts, batch_size=16)
     data_iter = batchify(imgs, img_ts, batch_size=32)
-    data_dic = {}
 
     norm_factor = np.iinfo(imgs.dtype).max
     for batch in tqdm(data_iter, desc="generating"):
         b_imgs, b_ts = batch
-        log_imgs, b_ts = torch.from_numpy(np.log(b_imgs/norm_factor + 1e-4)).float().to(device), torch.from_numpy(b_ts.astype(int)).to(device)
+        log_imgs, b_ts = torch.from_numpy(np.log(np.clip(b_imgs/norm_factor, 1.2e-7, None))).float().to(device), torch.from_numpy(b_ts.astype(int)).to(device)
         evs = esim.forward(log_imgs, b_ts)
 
         if evs is None:
@@ -127,9 +133,10 @@ def main(frame_dir, targ_f, ev_thresh = 0.2, device="cuda"):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--frame_dir", type=str, default="")
-    parser.add_argument("--targ_f", type=str)
-    parser.add_argument("--ev_thresh",type=float)
+    parser.add_argument("--frame_dir", type=str, default="/home/hunter/projects/ev_sim_converters/3D-Graphics-Engine/generated_imgs/half_checker_2048")
+    # parser.add_argument("--frame_dir", type=str, default="/home/hunter/projects/ev_sim_converters/3D-Graphics-Engine/generated_imgs/synth_tex_robo_2048")
+    parser.add_argument("--targ_f", type=str, default="re_cat_fancy_evs.hdf5")
+    parser.add_argument("--ev_thresh",type=float, default=0.2)
     args = parser.parse_args()
 
     main(args.frame_dir, args.targ_f, args.ev_thresh)
