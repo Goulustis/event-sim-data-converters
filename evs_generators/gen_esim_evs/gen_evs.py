@@ -92,7 +92,7 @@ def main(frame_dir, targ_f, ev_thresh = 0.2, device="cuda"):
     # out_f = "hosp_carpet_events.hdf5"
     img_fs = sorted(glob.glob(osp.join(frame_dir, "*.png")))
     # img_ts = gen_colcam_triggers(frame_dir, scene_mode="robo")
-    img_ts = np.loadtxt("/home/hunter/projects/ev_sim_converters/3D-Graphics-Engine/camera_data/triggers2048.txt")
+    img_ts = np.loadtxt("/home/hunter/projects/ev_sim_converters/3D-Graphics-Engine/camera_data/triggers4096.txt")
     print(f"using total of {len(img_fs)} to generate events")
 
     event_file = h5py.File(targ_f, "w")
