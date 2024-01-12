@@ -8,7 +8,7 @@ from camera import Camera, PlayCamera
 from camera_data.camera_spline import read_intrinsics, intrinsics_path
 from light import Light
 from mesh import Mesh
-from scene import Scene
+from scene import Scene, CarpetScene
 from scene_renderer import SceneRenderer
 from OpenGL.GL import *
 from PIL import Image
@@ -52,7 +52,7 @@ class GraphicsEngine:
         # mesh
         self.mesh = Mesh(self)
         # scene
-        self.scene = Scene(self)
+        self.scene = CarpetScene(self) #Scene(self)
         # renderer
         self.scene_renderer = SceneRenderer(self)
 
@@ -121,7 +121,7 @@ class SimulatorEngine:
         # mesh
         self.mesh = Mesh(self)
         # scene
-        self.scene = Scene(self)
+        self.scene = CarpetScene(self)
         # renderer
         self.scene_renderer = SceneRenderer(self)
 
@@ -206,7 +206,7 @@ if __name__ == '__main__':
     fx, fy, cx, cy = read_intrinsics(intrinsics_path)
     win_size = (int(cx*2), int(cy*2))
     # app = GraphicsEngine(win_size=win_size)
-    # app = SimulatorEngine(win_size=win_size, save_frame_dir="generated_imgs/carpet_tex_2048")
-    app = SimulatorEngine(win_size=win_size, save_frame_dir=args.outdir)
+    app = SimulatorEngine(win_size=win_size, save_frame_dir="generated_imgs/half_checker_256")
+    # app = SimulatorEngine(win_size=win_size, save_frame_dir=args.outdir)
     app.run()
 
