@@ -17,6 +17,7 @@ simulated event data converters and processing scripts. See the readme in each f
 setup to run create\_dataset.sh
 - install vid2e
 - install nerfies
+- install 3D-Graphics-Engine/requirement.txt
 
 ### generate a synthetic dataset
 - cd 3D-Graphics-Engine
