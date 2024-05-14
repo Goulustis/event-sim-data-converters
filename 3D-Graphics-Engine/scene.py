@@ -1,7 +1,6 @@
 from model import *
-import glm
 
-
+# NOTE: this is the cat scene
 class Scene:
     def __init__(self, app):
         self.app = app
