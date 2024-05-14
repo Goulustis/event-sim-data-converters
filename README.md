@@ -22,7 +22,7 @@ setup to run create\_dataset.sh
 ### generate a synthetic dataset
 - cd 3D-Graphics-Engine
 - bash create_imgs.sh
-- cd PATH/ev_sim_converters
+- cd PATH/event-sim-data-converters; back to project directory 
 - bash create_dataset.sh
 
 ### scene generation
