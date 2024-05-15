@@ -55,6 +55,9 @@ python format_col_set.py --dst_dir $DEST_DIR/colcam_set \
                          --coarse_rgb_dir $COARSE_FRAME_DIR \
                          --trig_ids_f $DEST_DIR/ecam_set/trig_ids.npy
 
+
+python fix_mirror_cams.py --scene $DEST_DIR
+
 echo $EV_THRESH >> $DEST_DIR/ecam_set/eimgs/ev_thresh.txt
 
 cp $DEST_DIR/colcam_set/scene.json $DEST_DIR/ecam_set/
